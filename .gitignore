@@ -1,0 +1,19 @@
+# Local settings / Azure API Keys (CRITICAL to ignore so they aren't uploaded to GitHub)
+azure_config.json
+
+# Input/Output folders containing camper data
+SurveyInput/
+SurveyOutput/
+*.pdf
+*.csv
+
+# Python environment and cache
+__pycache__/
+*.pyc
+venv/
+.venv/
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
