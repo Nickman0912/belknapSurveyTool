@@ -3,7 +3,7 @@ import argparse
 import json
 import base64
 import time
-from typing import List, Optional, Literal
+from typing import List, Optional
 import pandas as pd
 from pydantic import BaseModel, Field
 
@@ -30,48 +30,48 @@ class CampSurvey(BaseModel):
     cabin: str = Field(description="The cabin letter or number, handwritten at the top of the first page. E.g. 'H' or 'J-H'")
     
     # Q1-Q3 Experience ratings (1-5)
-    q1_cabin_rating: Optional[Literal[1, 2, 3, 4, 5]] = Field(description="Cabin rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome)")
-    q2_division_rating: Optional[Literal[1, 2, 3, 4, 5]] = Field(description="Division rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome)")
-    q3_camp_rating: Optional[Literal[1, 2, 3, 4, 5]] = Field(description="Whole camp rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome)")
+    q1_cabin_rating: Optional[int] = Field(description="Cabin rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome)")
+    q2_division_rating: Optional[int] = Field(description="Division rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome)")
+    q3_camp_rating: Optional[int] = Field(description="Whole camp rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome)")
     
     # Q4 Session Days Rating (1-11, where 1 is favorite and 11 is least favorite, or 'NA' if written)
-    q4_monday: Optional[Literal["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "NA"]] = Field(description="Rating for Monday (1-11, or 'NA' if written/empty)")
-    q4_tuesday: Optional[Literal["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "NA"]] = Field(description="Rating for Tuesday (1-11, or 'NA' if written/empty)")
-    q4_wednesday: Optional[Literal["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "NA"]] = Field(description="Rating for Wednesday (1-11, or 'NA' if written/empty)")
-    q4_thursday: Optional[Literal["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "NA"]] = Field(description="Rating for Thursday (1-11, or 'NA' if written/empty)")
-    q4_friday: Optional[Literal["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "NA"]] = Field(description="Rating for Friday (1-11, or 'NA' if written/empty)")
-    q4_saturday: Optional[Literal["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "NA"]] = Field(description="Rating for Saturday (1-11, or 'NA' if written/empty)")
-    q4_sunday: Optional[Literal["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "NA"]] = Field(description="Rating for Sunday (1-11, or 'NA' if written/empty)")
-    q4_2nd_monday: Optional[Literal["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "NA"]] = Field(description="Rating for 2nd Monday (1-11, or 'NA' if written/empty)")
-    q4_2nd_tuesday: Optional[Literal["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "NA"]] = Field(description="Rating for 2nd Tuesday (1-11, or 'NA' if written/empty)")
-    q4_2nd_wednesday: Optional[Literal["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "NA"]] = Field(description="Rating for 2nd Wednesday (1-11, or 'NA' if written/empty)")
-    q4_2nd_thursday: Optional[Literal["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "NA"]] = Field(description="Rating for 2nd Thursday (1-11, or 'NA' if written/empty)")
+    q4_monday: Optional[str] = Field(description="Rating for Monday (1-11, or 'NA' if written/empty)")
+    q4_tuesday: Optional[str] = Field(description="Rating for Tuesday (1-11, or 'NA' if written/empty)")
+    q4_wednesday: Optional[str] = Field(description="Rating for Wednesday (1-11, or 'NA' if written/empty)")
+    q4_thursday: Optional[str] = Field(description="Rating for Thursday (1-11, or 'NA' if written/empty)")
+    q4_friday: Optional[str] = Field(description="Rating for Friday (1-11, or 'NA' if written/empty)")
+    q4_saturday: Optional[str] = Field(description="Rating for Saturday (1-11, or 'NA' if written/empty)")
+    q4_sunday: Optional[str] = Field(description="Rating for Sunday (1-11, or 'NA' if written/empty)")
+    q4_2nd_monday: Optional[str] = Field(description="Rating for 2nd Monday (1-11, or 'NA' if written/empty)")
+    q4_2nd_tuesday: Optional[str] = Field(description="Rating for 2nd Tuesday (1-11, or 'NA' if written/empty)")
+    q4_2nd_wednesday: Optional[str] = Field(description="Rating for 2nd Wednesday (1-11, or 'NA' if written/empty)")
+    q4_2nd_thursday: Optional[str] = Field(description="Rating for 2nd Thursday (1-11, or 'NA' if written/empty)")
     
     # Q5 Favorite Part of the Day
-    q5_favorite_part_of_day: Optional[Literal["Meals", "General Swim", "Free Time in Divisions", "Program Periods", "Siesta", "Evening Activities", "Vespers"]] = Field(description="Favorite part of the day (Circle your answer: Meals, General Swim, Free Time in Divisions, Program Periods, Siesta, Evening Activities, Vespers)")
+    q5_favorite_part_of_day: Optional[str] = Field(description="Favorite part of the day (Circle your answer: Meals, General Swim, Free Time in Divisions, Program Periods, Siesta, Evening Activities, Vespers)")
     
     # Q6 Play club/varsity sport
-    q6_plays_sport: Optional[Literal["Yes", "No"]] = Field(description="Do you play a club sport or varsity sport? (Yes or No)")
+    q6_plays_sport: Optional[str] = Field(description="Do you play a club sport or varsity sport? (Yes or No)")
     
     # Q7 Play that sport while at camp
-    q7_plays_sport_at_camp: Optional[Literal["Yes", "No"]] = Field(description="Did you play that sport while at camp? (Yes or No)")
+    q7_plays_sport_at_camp: Optional[str] = Field(description="Did you play that sport while at camp? (Yes or No)")
     
     # Q8 What camp activities were your favorite?
     q8_favorite_camp_activities: List[str] = Field(default_factory=list, description="List of camp activities circled/selected as favorites in Question 8. Look for circled/marked items on the page, which are listed in columns, e.g., Baseball, Low Ropes, Street Hockey, Adams' Cup, Soccer, Archery, Basketball, tennis, Woodshop, Nature, Crafts, Swimming, Windsurfing, Sailing, etc.")
     
     # Q9 How many new activities did you try?
-    q9_new_activities_tried: Optional[Literal[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]] = Field(description="How many new activities did you try? (Circle 0-10)")
+    q9_new_activities_tried: Optional[int] = Field(description="How many new activities did you try? (Circle 0-10)")
     
     # Q10 Did you go to an activity that you weren't the best at yet?
-    q10_tried_activity_not_best_at: Optional[Literal["Yes", "No"]] = Field(description="Did you go to an activity that you weren't the best at yet? (Yes or No)")
+    q10_tried_activity_not_best_at: Optional[str] = Field(description="Did you go to an activity that you weren't the best at yet? (Yes or No)")
     
     # Q11-Q16 Ratings (1-5, where 1 is Not at all, 5 is Very/A lot)
-    q11_inclusion_rating: Optional[Literal[1, 2, 3, 4, 5]] = Field(description="How included did you feel in activities? (Rating 1-5)")
-    q12_new_friends_met: Optional[Literal["1", "2", "3", "4", "5+"]] = Field(description="How many new friends did you meet at camp this summer? (Circle 1, 2, 3, 4, 5+)")
-    q13_campers_listening_rating: Optional[Literal[1, 2, 3, 4, 5]] = Field(description="How much did other campers listen to your ideas and opinions? (Rating 1-5)")
-    q14_cabin_leader_comfort: Optional[Literal[1, 2, 3, 4, 5]] = Field(description="How comfortable did you feel talking to your cabin leader? (Rating 1-5)")
-    q15_return_next_summer: Optional[Literal[1, 2, 3, 4, 5]] = Field(description="How interested are you in coming back to camp next summer? (Rating 1-5)")
-    q16_recommend_camp: Optional[Literal[1, 2, 3, 4, 5]] = Field(description="How likely are you to recommend Camp Belknap to someone else? (Rating 1-5)")
+    q11_inclusion_rating: Optional[int] = Field(description="How included did you feel in activities? (Rating 1-5)")
+    q12_new_friends_met: Optional[str] = Field(description="How many new friends did you meet at camp this summer? (Circle 1, 2, 3, 4, 5+)")
+    q13_campers_listening_rating: Optional[int] = Field(description="How much did other campers listen to your ideas and opinions? (Rating 1-5)")
+    q14_cabin_leader_comfort: Optional[int] = Field(description="How comfortable did you feel talking to your cabin leader? (Rating 1-5)")
+    q15_return_next_summer: Optional[int] = Field(description="How interested are you in coming back to camp next summer? (Rating 1-5)")
+    q16_recommend_camp: Optional[int] = Field(description="How likely are you to recommend Camp Belknap to someone else? (Rating 1-5)")
     
     # Q17 Comments
     q17_additional_comments: Optional[str] = Field(description="What else would like us to know about your camp experience? Transcribe the handwritten response exactly.")
