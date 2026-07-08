@@ -41,16 +41,16 @@ css_styles = """
         font-family: 'Quicksand', sans-serif !important;
     }
     
-    /* Global text colors for readability on the light background */
-    label,
-    p:not(.sub-title):not(.log-title) {
+    /* Scoped high-contrast text color overrides for widgets inside the main panel only */
+    .block-container .stRadio label,
+    .block-container .stRadio p,
+    .block-container .stFileUploader label,
+    .block-container .stFileUploader p,
+    .block-container [data-testid="stFileUploadDropzone"] small,
+    .block-container [data-testid="stFileUploadDropzone"] span {
         color: #2D312E !important;
     }
-    small,
-    span:not(.stButton span):not([data-testid="stSidebar"] span) {
-        color: #4B524D !important;
-    }
-    [data-testid="stFileUploadDropzone"] button span {
+    .block-container [data-testid="stFileUploadDropzone"] button span {
         color: #FFFFFF !important;
     }
     
