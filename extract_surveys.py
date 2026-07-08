@@ -16,7 +16,7 @@ except ImportError:
     exit(1)
 
 try:
-    from openai import OpenAI, AzureOpenAI
+    from openai import OpenAI, AzureOpenAI, RateLimitError
     from openai import APIError
 except ImportError:
     print("Error: The 'openai' package is not installed.")
@@ -143,8 +143,14 @@ def process_survey_chunk(
             
             return completion.choices[0].message.parsed
             
+        except RateLimitError as e:
+            print(f"  Rate limit hit on attempt {attempt+1}/{retries}. Waiting 25 seconds before retrying...")
+            if attempt < retries - 1:
+                time.sleep(25)
+            else:
+                print(f"  Failed to process Survey #{survey_num} after {retries} attempts due to Rate Limit.")
         except APIError as e:
-            print(f"  Azure OpenAI API error on attempt {attempt+1}/{retries}: {e}")
+            print(f"  API error on attempt {attempt+1}/{retries}: {e}")
             if attempt < retries - 1:
                 time.sleep(2 ** attempt)
             else:
