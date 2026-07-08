@@ -140,19 +140,19 @@ def process_survey_chunk(
         prompt = (
             "You are an expert OCR and survey processing AI. Analyze these 2 survey page images, which are scans of a Leader Survey (Summer 2026) for Camp Belknap.\n"
             "Carefully extract the leader's handwritten and circled answers for each question:\n"
-            "- Note that the majority of questions have the leader circle one or more answers (for ratings or multiple choice), or they are free text (for names, cabins, and comments).\n"
+            "- CRITICAL: Only extract answers that have been clearly circled, checked, or written by hand. Do not select or extract default printed options unless they have a handwritten circle, checkmark, or pen mark on/around them.\n"
+            "- If a question or the entire page is completely blank/unmarked, you MUST set those fields to null (or an empty list for lists). Do not guess or hallucinate any answers.\n"
             "- Extract circled numbers, circled words, and handwritten comments/names exactly as written.\n"
             "- For questions 9, 10, and 11, extract the list of handwritten names (up to 3 names each).\n"
-            "- If a question was not answered or is completely empty, leave it null.\n"
             "- Ensure the output conforms to the requested JSON schema structure."
         )
     else:
         prompt = (
             "You are an expert OCR and survey processing AI. Analyze these 2 survey page images, which are scans of a Camper Survey 2026 for Camp Belknap.\n"
             "Carefully extract the camper's handwritten and circled answers for each question:\n"
-            "- Note that the majority of questions have the camper circle one or more answers (for ratings or multiple choice), or they are free text (for division, cabin, and comments).\n"
+            "- CRITICAL: Only extract answers that have been clearly circled, checked, or written by hand. Do not select or extract default printed options unless they have a handwritten circle, checkmark, or pen mark on/around them.\n"
+            "- If a question or the entire page is completely blank/unmarked, you MUST set those fields to null (or an empty list for lists). Do not guess or hallucinate any answers.\n"
             "- Extract circled numbers, circled words, and handwritten comments exactly as marked.\n"
-            "- If a question was not answered or is completely empty, leave it null.\n"
             "- Ensure the output conforms to the requested JSON schema structure."
         )
     
