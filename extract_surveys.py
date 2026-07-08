@@ -57,7 +57,7 @@ class CampSurvey(BaseModel):
     q7_plays_sport_at_camp: Optional[str] = Field(description="Did you play that sport while at camp? (Yes or No)")
     
     # Q8 What camp activities were your favorite?
-    q8_favorite_camp_activities: List[str] = Field(default_factory=list, description="List of camp activities circled/selected as favorites in Question 8. Look for circled/marked items on the page, which are listed in columns, e.g., Baseball, Low Ropes, Street Hockey, Adams' Cup, Soccer, Archery, Basketball, tennis, Woodshop, Nature, Crafts, Swimming, Windsurfing, Sailing, etc.")
+    q8_favorite_camp_activities: List[str] = Field(default_factory=list, description="List of camp activities circled/selected as favorites in Question 8.")
     
     # Q9 How many new activities did you try?
     q9_new_activities_tried: Optional[int] = Field(description="How many new activities did you try? (Circle 0-10)")
@@ -104,13 +104,10 @@ def process_survey_chunk(
     prompt = (
         "You are an expert OCR and survey processing AI. Analyze these 2 survey page images, which are scans of a Camper Survey for Camp Belknap.\n"
         "Carefully extract the camper's handwritten and circled answers for each question:\n"
-        "- Look for circled numbers, circled words, checked boxes, and handwritten numbers in tables.\n"
-        "- For questions with circular selections (like ratings 1-5 or yes/no): extract the circled/marked number or text. Refer to the schema field constraints to ensure selections correspond only to the allowed options.\n"
-        "- For question 4 (rating table), read the handwritten numbers (1-11) or 'NA' for each day. Pay close attention to handwriting.\n"
-        "- For question 8 (favorite activities), list all activities that have been circled or marked (the options are listed in columns, e.g., Baseball, Low Ropes, Street Hockey).\n"
-        "- For question 17 (additional comments), transcribe the handwritten comment exactly as written. If they wrote 'Nothing' or 'N/A', transcribe that. If blank, return null.\n"
+        "- Note that the majority of questions have the camper circle one or more answers (for ratings or multiple choice), or they are free text (for names, cabins, and comments).\n"
+        "- Extract circled numbers, circled words, and handwritten comments/numbers exactly as marked.\n"
         "- If a question was not answered or is completely empty, leave it null.\n"
-        "- Ensure the output strictly conforms to the allowed options and constraints in the requested JSON schema."
+        "- Ensure the output conforms to the requested JSON schema structure."
     )
     
     # Construct the multimodal user content
