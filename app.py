@@ -41,14 +41,13 @@ css_styles = """
         font-family: 'Quicksand', sans-serif !important;
     }
     
-    /* Force dark color on main area text elements so they are visible on the light background */
-    [data-testid="stAppViewBlockContainer"] label,
-    [data-testid="stAppViewBlockContainer"] p:not(.sub-title):not(.log-title),
-    [data-testid="stAppViewBlockContainer"] div[data-testid="stMarkdownContainer"] p:not(.sub-title):not(.log-title) {
+    /* Global text colors for readability on the light background */
+    label,
+    p:not(.sub-title):not(.log-title) {
         color: #2D312E !important;
     }
-    [data-testid="stFileUploadDropzone"] small,
-    [data-testid="stFileUploadDropzone"] span {
+    small,
+    span:not(.stButton span):not([data-testid="stSidebar"] span) {
         color: #4B524D !important;
     }
     [data-testid="stFileUploadDropzone"] button span {
