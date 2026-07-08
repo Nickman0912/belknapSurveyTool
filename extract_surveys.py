@@ -25,90 +25,90 @@ except ImportError:
 
 # Define the Pydantic schema for the camper survey
 class CamperSurvey2026(BaseModel):
-    division: Optional[str] = Field(description="The division name at the top of the first page. E.g. 'Juniors'")
-    cabin: Optional[str] = Field(description="The cabin letter or number at the top of the first page. E.g. 'H' or 'J-H'")
+    division: Optional[str] = Field(description="The division name at the top of the first page. E.g. 'Juniors'. Return null if blank.")
+    cabin: Optional[str] = Field(description="The cabin letter or number at the top of the first page. E.g. 'H' or 'J-H'. Return null if blank.")
     
     # Q1-Q3 Experience ratings (1-5)
-    q1_cabin_rating: Optional[int] = Field(description="Cabin rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome)")
-    q2_division_rating: Optional[int] = Field(description="Division rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome)")
-    q3_camp_rating: Optional[int] = Field(description="Whole camp rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome)")
+    q1_cabin_rating: Optional[int] = Field(description="Cabin rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome). Return null if not circled.")
+    q2_division_rating: Optional[int] = Field(description="Division rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome). Return null if not circled.")
+    q3_camp_rating: Optional[int] = Field(description="Whole camp rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome). Return null if not circled.")
     
     # Q4 Favorite Part of the Day
-    q4_favorite_part_of_day: Optional[str] = Field(description="Favorite part of the day (Circle your answer: Meals, Vespers, Evening Activities, Program Periods, Siesta, General Swim, Free Time in Divisions)")
+    q4_favorite_part_of_day: Optional[str] = Field(description="Favorite part of the day (Circle your answer: Meals, Vespers, Evening Activities, Program Periods, Siesta, General Swim, Free Time in Divisions). Return null if not circled.")
     
     # Q5 What camp activities were your favorite?
-    q5_favorite_camp_activities: List[str] = Field(default_factory=list, description="List of camp activities circled/selected as favorites in Question 5.")
+    q5_favorite_camp_activities: List[str] = Field(default_factory=list, description="List of camp activities circled/selected as favorites in Question 5. Return empty list if none are circled.")
     
     # Q6 How many new activities did you try?
-    q6_new_activities_tried: Optional[int] = Field(description="How many new activities did you try? (Circle 0-10)")
+    q6_new_activities_tried: Optional[int] = Field(description="How many new activities did you try? (Circle 0-10). Return null if not circled.")
     
     # Q7 Do you play a club sport or varsity sport at home?
-    q7_plays_sport_at_home: Optional[str] = Field(description="Do you play a club sport or varsity sport at home? (Circle Yes or No)")
+    q7_plays_sport_at_home: Optional[str] = Field(description="Do you play a club sport or varsity sport at home? (Circle Yes or No). Return null if not circled.")
     
     # Q8 Did you play that sport while at camp?
-    q8_played_sport_at_camp: Optional[str] = Field(description="Did you play that sport while at camp? (Circle Yes or No)")
+    q8_played_sport_at_camp: Optional[str] = Field(description="Did you play that sport while at camp? (Circle Yes or No). Return null if not circled.")
     
     # Q9 Did you go to an activity that you weren't the best at yet?
-    q9_tried_activity_not_best_at: Optional[str] = Field(description="Did you go to an activity that you weren't the best at yet? (Circle Yes or No)")
+    q9_tried_activity_not_best_at: Optional[str] = Field(description="Did you go to an activity that you weren't the best at yet? (Circle Yes or No). Return null if not circled.")
     
     # Q10 How included did you feel in activities?
-    q10_inclusion_rating: Optional[int] = Field(description="How included did you feel in activities? (Rating 1-5)")
+    q10_inclusion_rating: Optional[int] = Field(description="How included did you feel in activities? (Rating 1-5). Return null if not circled.")
     
     # Q11 How many new friends did you meet at camp this summer?
-    q11_new_friends_met: Optional[str] = Field(description="How many new friends did you meet at camp this summer? (Circle 1, 2, 3, 4, 5+)")
+    q11_new_friends_met: Optional[str] = Field(description="How many new friends did you meet at camp this summer? (Circle 1, 2, 3, 4, 5+). Return null if not circled.")
     
     # Q12 How comfortable did you feel talking to your cabin leader?
-    q12_cabin_leader_comfort: Optional[int] = Field(description="How comfortable did you feel talking to your cabin leader? (Rating 1-5)")
+    q12_cabin_leader_comfort: Optional[int] = Field(description="How comfortable did you feel talking to your cabin leader? (Rating 1-5). Return null if not circled.")
     
     # Q13 How interested are you in coming back to camp next summer?
-    q13_return_next_summer: Optional[int] = Field(description="How interested are you in coming back to camp next summer? (Rating 1-5)")
+    q13_return_next_summer: Optional[int] = Field(description="How interested are you in coming back to camp next summer? (Rating 1-5). Return null if not circled.")
     
     # Q14 How likely are you to recommend Camp Belknap to someone else?
-    q14_recommend_camp: Optional[int] = Field(description="How likely are you to recommend Camp Belknap to someone else? (Rating 1-5)")
+    q14_recommend_camp: Optional[int] = Field(description="How likely are you to recommend Camp Belknap to someone else? (Rating 1-5). Return null if not circled.")
     
     # Q15 What else would you like us to know about your camp experience?
-    q15_additional_comments: Optional[str] = Field(description="What else would you like us to know about your camp experience? Transcribe the handwritten response exactly.")
+    q15_additional_comments: Optional[str] = Field(description="What else would you like us to know about your camp experience? Transcribe the handwritten response exactly. Return null if blank.")
 
 
 class LeaderSurvey2026(BaseModel):
-    leader_name: Optional[str] = Field(description="The leader's name handwritten at the top of the first page.")
-    division: Optional[str] = Field(description="The division name handwritten at the top of the first page. E.g. 'Juniors'")
-    cabin: Optional[str] = Field(description="The cabin letter or number handwritten at the top of the first page. E.g. 'H' or 'J-H'")
+    leader_name: Optional[str] = Field(description="The leader's name handwritten at the top of the first page. Return null if blank.")
+    division: Optional[str] = Field(description="The division name handwritten at the top of the first page. E.g. 'Juniors'. Return null if blank.")
+    cabin: Optional[str] = Field(description="The cabin letter or number handwritten at the top of the first page. E.g. 'H' or 'J-H'. Return null if blank.")
     
     # Q1-Q3 Experience ratings (1-5)
-    q1_cabin_rating: Optional[int] = Field(description="Cabin rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome)")
-    q2_division_rating: Optional[int] = Field(description="Division rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome)")
-    q3_camp_rating: Optional[int] = Field(description="Whole camp rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome)")
+    q1_cabin_rating: Optional[int] = Field(description="Cabin rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome). Return null if not circled.")
+    q2_division_rating: Optional[int] = Field(description="Division rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome). Return null if not circled.")
+    q3_camp_rating: Optional[int] = Field(description="Whole camp rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome). Return null if not circled.")
     
     # Q4 Rate your overall well-being during this session
-    q4_well_being_rating: Optional[int] = Field(description="Overall well-being rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome)")
+    q4_well_being_rating: Optional[int] = Field(description="Overall well-being rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome). Return null if not circled.")
     
     # Q5 Were you able to be present, engaged, and focused during the session?
-    q5_focus_rating: Optional[int] = Field(description="Ability to be present, engaged, and focused (circle 1-5, where 1 is Not at all, 3 is Some of the time, 5 is The whole time)")
+    q5_focus_rating: Optional[int] = Field(description="Ability to be present, engaged, and focused (circle 1-5, where 1 is Not at all, 3 is Some of the time, 5 is The whole time). Return null if not circled.")
     
     # Q6 Were there parts of this session that felt difficult (please explain)?
-    q6_difficult_parts: Optional[str] = Field(description="Transcribe the printed explanation of what parts of the session felt difficult.")
+    q6_difficult_parts: Optional[str] = Field(description="Transcribe the printed explanation of what parts of the session felt difficult. Return null if blank.")
     
     # Q7 What support or experiences made your job as a Belknap leader easier this session?
-    q7_easier_support: Optional[str] = Field(description="Transcribe what support or experiences made their job as a leader easier.")
+    q7_easier_support: Optional[str] = Field(description="Transcribe what support or experiences made their job as a leader easier. Return null if blank.")
     
     # Q8 What was your favorite part of the day?
-    q8_favorite_part_of_day: Optional[str] = Field(description="Favorite part of the day (Circle your answer: Meals, Program Periods, General Swim, Siesta, Vespers, Free time in Divs, Evening Activities)")
+    q8_favorite_part_of_day: Optional[str] = Field(description="Favorite part of the day (Circle your answer: Meals, Program Periods, General Swim, Siesta, Vespers, Free time in Divs, Evening Activities). Return null if not circled.")
     
     # Q9 Campers who needed the most extra support
-    q9_campers_needing_support: List[str] = Field(default_factory=list, description="List of names written under Question 9 (campers needing extra support).")
+    q9_campers_needing_support: List[str] = Field(default_factory=list, description="List of names written under Question 9 (campers needing extra support). Return empty list if blank.")
     
     # Q10 Campers ignored or not listened to by their peers
-    q10_campers_ignored: List[str] = Field(default_factory=list, description="List of names written under Question 10 (campers ignored or not listened to by peers).")
+    q10_campers_ignored: List[str] = Field(default_factory=list, description="List of names written under Question 10 (campers ignored or not listened to by peers). Return empty list if blank.")
     
     # Q11 Campers suggested to reach out to in the off season
-    q11_campers_reach_out: List[str] = Field(default_factory=list, description="List of names written under Question 11 (campers to reach out to in off season).")
+    q11_campers_reach_out: List[str] = Field(default_factory=list, description="List of names written under Question 11 (campers to reach out to in off season). Return empty list if blank.")
     
     # Q12 What else would you like the senior staff to know about your experience?
-    q12_additional_comments: Optional[str] = Field(description="Transcribe the comments under Question 12 exactly.")
+    q12_additional_comments: Optional[str] = Field(description="Transcribe the comments under Question 12 exactly. Return null if blank.")
     
     # Q13 What do you think Belknap should do to increase the number of leaders who return each summer?
-    q13_increase_returning_leaders: Optional[str] = Field(description="Transcribe the recommendations under Question 13 exactly.")
+    q13_increase_returning_leaders: Optional[str] = Field(description="Transcribe the recommendations under Question 13 exactly. Return null if blank.")
 
 
 def get_survey_images_base64(doc: fitz.Document, start_page: int, end_page: int) -> List[str]:
@@ -171,8 +171,9 @@ def process_survey_chunk(
         "CRITICAL RULES:\n"
         "1. If a question is unmarked (no circle, checkmark, or handwritten text), the field MUST be null (or an empty list for lists). Do not select a default printed value.\n"
         "2. If the entire survey is blank (has no handwriting, circles, or marks), ALL fields in the output schema MUST be null (or empty lists). Do not guess or hallucinate any answers.\n"
-        "3. Do NOT make up comments (e.g., do NOT invent a comment like 'I had a great time and made lots of friends!' if the comment area is blank). If the comment box has no handwritten pen/pencil writing, the field must be null.\n"
-        "4. Only transcribe actual handwritten marks made by the camper/leader. Do not transcribe printed labels or instructions."
+        "3. Do NOT make up comments or ratings. If a box or rating question has no handwritten pen/pencil circle or writing, the field must be null.\n"
+        "4. Ignore scanner noise, dust, page creases, or faint background shadows. Only count an option as selected if there is a clear, high-contrast, hand-drawn pen or pencil mark (like a circle or checkmark) around/on it. If a question has no clear handwritten mark, return null.\n"
+        "5. Only transcribe actual handwritten marks made by the camper/leader. Do not transcribe printed labels or instructions."
     )
     
     messages = [
