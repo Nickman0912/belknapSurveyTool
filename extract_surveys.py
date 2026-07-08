@@ -317,7 +317,7 @@ def main():
         model_name = deployment
     else:
         client = OpenAI(api_key=api_key)
-        model_name = deployment or "gpt-4o-mini"
+        model_name = deployment or "gpt-4o"
     
     # Resolve schema class
     schema_class = LeaderSurvey2026 if args.type == "leader" else CamperSurvey2026

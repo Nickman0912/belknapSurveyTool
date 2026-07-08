@@ -332,7 +332,7 @@ def load_config():
                 return json.load(f)
         except Exception:
             pass
-    return {"api_provider": "Standard OpenAI (Direct)", "api_key": "", "endpoint": "", "deployment": "gpt-4o-mini", "api_version": "2024-08-01-preview"}
+    return {"api_provider": "Standard OpenAI (Direct)", "api_key": "", "endpoint": "", "deployment": "gpt-4o", "api_version": "2024-08-01-preview"}
 
 def save_config(api_provider, api_key, endpoint, deployment, api_version):
     """Saves credentials to a local JSON file."""
@@ -472,7 +472,7 @@ if uploaded_file is not None:
             else:
                 # Initialize standard OpenAI Client
                 client = OpenAI(api_key=api_key_input.strip())
-                model_name = deployment_input.strip() or "gpt-4o-mini"
+                model_name = deployment_input.strip() or "gpt-4o"
             
             # Resolve schema class
             schema_class = LeaderSurvey2026 if survey_type == "Leader Survey 2026" else CamperSurvey2026
