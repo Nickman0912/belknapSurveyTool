@@ -166,7 +166,20 @@ def process_survey_chunk(
             }
         })
         
+    system_instruction = (
+        "You are a strict OCR data extraction system. You extract ONLY handwritten text, hand-drawn circle selections, or checks from the provided images of camper/leader surveys.\n"
+        "CRITICAL RULES:\n"
+        "1. If a question is unmarked (no circle, checkmark, or handwritten text), the field MUST be null (or an empty list for lists). Do not select a default printed value.\n"
+        "2. If the entire survey is blank (has no handwriting, circles, or marks), ALL fields in the output schema MUST be null (or empty lists). Do not guess or hallucinate any answers.\n"
+        "3. Do NOT make up comments (e.g., do NOT invent a comment like 'I had a great time and made lots of friends!' if the comment area is blank). If the comment box has no handwritten pen/pencil writing, the field must be null.\n"
+        "4. Only transcribe actual handwritten marks made by the camper/leader. Do not transcribe printed labels or instructions."
+    )
+    
     messages = [
+        {
+            "role": "system",
+            "content": system_instruction
+        },
         {
             "role": "user",
             "content": content_list
