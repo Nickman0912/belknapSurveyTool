@@ -117,8 +117,8 @@ def get_survey_images_base64(doc: fitz.Document, start_page: int, end_page: int)
     # fitz pages are 0-indexed, so we subtract 1 from start_page and end_page
     for page_num in range(start_page - 1, min(end_page, len(doc))):
         page = doc.load_page(page_num)
-        # 150 DPI is a good balance of OCR accuracy and file size
-        pix = page.get_pixmap(dpi=150)
+        # 200 DPI provides sharper image edges for vision OCR without increasing token charges (scaled by API)
+        pix = page.get_pixmap(dpi=200)
         img_bytes = pix.tobytes("png")
         base64_str = base64.b64encode(img_bytes).decode("utf-8")
         base64_images.append(base64_str)
@@ -139,21 +139,19 @@ def process_survey_chunk(
     if schema_class.__name__ == "LeaderSurvey2026":
         prompt = (
             "You are an expert OCR and survey processing AI. Analyze these 2 survey page images, which are scans of a Leader Survey (Summer 2026) for Camp Belknap.\n"
-            "Carefully extract the leader's handwritten and circled answers for each question:\n"
-            "- CRITICAL: Only extract answers that have been clearly circled, checked, or written by hand. Do not select or extract default printed options unless they have a handwritten circle, checkmark, or pen mark on/around them.\n"
-            "- If a question or the entire page is completely blank/unmarked, you MUST set those fields to null (or an empty list for lists). Do not guess or hallucinate any answers.\n"
-            "- Extract circled numbers, circled words, and handwritten comments/names exactly as written.\n"
-            "- For questions 9, 10, and 11, extract the list of handwritten names (up to 3 names each).\n"
-            "- Ensure the output conforms to the requested JSON schema structure."
+            "CRITICAL DIRECTIVES:\n"
+            "1. First check if the survey is completely blank/unmarked. If there is no handwriting, drawings, circles, or marks, you MUST return a completely empty response with null for all fields (or empty lists for lists).\n"
+            "2. Only extract answers that have a clear, high-contrast, hand-drawn pen/pencil circle, checkmark, or handwritten text. Do not select or extract default printed options unless they are explicitly marked by the user.\n"
+            "3. If a specific question is blank or unmarked, you must set that field to null. Do not guess or make up answers.\n"
+            "4. For questions 9, 10, and 11, extract the list of handwritten names exactly as written (up to 3 names each)."
         )
     else:
         prompt = (
             "You are an expert OCR and survey processing AI. Analyze these 2 survey page images, which are scans of a Camper Survey 2026 for Camp Belknap.\n"
-            "Carefully extract the camper's handwritten and circled answers for each question:\n"
-            "- CRITICAL: Only extract answers that have been clearly circled, checked, or written by hand. Do not select or extract default printed options unless they have a handwritten circle, checkmark, or pen mark on/around them.\n"
-            "- If a question or the entire page is completely blank/unmarked, you MUST set those fields to null (or an empty list for lists). Do not guess or hallucinate any answers.\n"
-            "- Extract circled numbers, circled words, and handwritten comments exactly as marked.\n"
-            "- Ensure the output conforms to the requested JSON schema structure."
+            "CRITICAL DIRECTIVES:\n"
+            "1. First check if the survey is completely blank/unmarked. If there is no handwriting, drawings, circles, or marks, you MUST return a completely empty response with null for all fields (or empty lists for lists).\n"
+            "2. Only extract answers that have a clear, high-contrast, hand-drawn pen/pencil circle, checkmark, or handwritten text. Do not select or extract default printed options unless they are explicitly marked by the user.\n"
+            "3. If a specific question is blank or unmarked, you must set that field to null. Do not guess or make up answers."
         )
     
     # Construct the multimodal user content
