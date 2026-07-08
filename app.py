@@ -41,6 +41,20 @@ css_styles = """
         font-family: 'Quicksand', sans-serif !important;
     }
     
+    /* Force dark color on main area text elements so they are visible on the light background */
+    [data-testid="stAppViewBlockContainer"] label,
+    [data-testid="stAppViewBlockContainer"] p:not(.sub-title):not(.log-title),
+    [data-testid="stAppViewBlockContainer"] div[data-testid="stMarkdownContainer"] p:not(.sub-title):not(.log-title) {
+        color: #2D312E !important;
+    }
+    [data-testid="stFileUploadDropzone"] small,
+    [data-testid="stFileUploadDropzone"] span {
+        color: #4B524D !important;
+    }
+    [data-testid="stFileUploadDropzone"] button span {
+        color: #FFFFFF !important;
+    }
+    
     /* Background with parallax effect and soft warm sand fade overlay */
     [data-testid='stAppViewContainer'] {
         background-image: linear-gradient(rgba(253, 251, 247, 0.88), rgba(253, 251, 247, 0.88)), url('data:image/png;base64,{bg_img_base64}');
