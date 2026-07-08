@@ -24,57 +24,91 @@ except ImportError:
     exit(1)
 
 # Define the Pydantic schema for the camper survey
-class CampSurvey(BaseModel):
-    camper_name: str = Field(description="The name of the camper, handwritten at the top of the first page. E.g. 'Grant Braasch'")
-    division: str = Field(description="The division name, handwritten at the top of the first page. E.g. 'Juniors'")
-    cabin: str = Field(description="The cabin letter or number, handwritten at the top of the first page. E.g. 'H' or 'J-H'")
+class CamperSurvey2026(BaseModel):
+    division: Optional[str] = Field(description="The division name at the top of the first page. E.g. 'Juniors'")
+    cabin: Optional[str] = Field(description="The cabin letter or number at the top of the first page. E.g. 'H' or 'J-H'")
     
     # Q1-Q3 Experience ratings (1-5)
     q1_cabin_rating: Optional[int] = Field(description="Cabin rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome)")
     q2_division_rating: Optional[int] = Field(description="Division rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome)")
     q3_camp_rating: Optional[int] = Field(description="Whole camp rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome)")
     
-    # Q4 Session Days Rating (1-11, where 1 is favorite and 11 is least favorite, or 'NA' if written)
-    q4_monday: Optional[str] = Field(description="Rating for Monday (1-11, or 'NA' if written/empty)")
-    q4_tuesday: Optional[str] = Field(description="Rating for Tuesday (1-11, or 'NA' if written/empty)")
-    q4_wednesday: Optional[str] = Field(description="Rating for Wednesday (1-11, or 'NA' if written/empty)")
-    q4_thursday: Optional[str] = Field(description="Rating for Thursday (1-11, or 'NA' if written/empty)")
-    q4_friday: Optional[str] = Field(description="Rating for Friday (1-11, or 'NA' if written/empty)")
-    q4_saturday: Optional[str] = Field(description="Rating for Saturday (1-11, or 'NA' if written/empty)")
-    q4_sunday: Optional[str] = Field(description="Rating for Sunday (1-11, or 'NA' if written/empty)")
-    q4_2nd_monday: Optional[str] = Field(description="Rating for 2nd Monday (1-11, or 'NA' if written/empty)")
-    q4_2nd_tuesday: Optional[str] = Field(description="Rating for 2nd Tuesday (1-11, or 'NA' if written/empty)")
-    q4_2nd_wednesday: Optional[str] = Field(description="Rating for 2nd Wednesday (1-11, or 'NA' if written/empty)")
-    q4_2nd_thursday: Optional[str] = Field(description="Rating for 2nd Thursday (1-11, or 'NA' if written/empty)")
+    # Q4 Favorite Part of the Day
+    q4_favorite_part_of_day: Optional[str] = Field(description="Favorite part of the day (Circle your answer: Meals, Vespers, Evening Activities, Program Periods, Siesta, General Swim, Free Time in Divisions)")
     
-    # Q5 Favorite Part of the Day
-    q5_favorite_part_of_day: Optional[str] = Field(description="Favorite part of the day (Circle your answer: Meals, General Swim, Free Time in Divisions, Program Periods, Siesta, Evening Activities, Vespers)")
+    # Q5 What camp activities were your favorite?
+    q5_favorite_camp_activities: List[str] = Field(default_factory=list, description="List of camp activities circled/selected as favorites in Question 5.")
     
-    # Q6 Play club/varsity sport
-    q6_plays_sport: Optional[str] = Field(description="Do you play a club sport or varsity sport? (Yes or No)")
+    # Q6 How many new activities did you try?
+    q6_new_activities_tried: Optional[int] = Field(description="How many new activities did you try? (Circle 0-10)")
     
-    # Q7 Play that sport while at camp
-    q7_plays_sport_at_camp: Optional[str] = Field(description="Did you play that sport while at camp? (Yes or No)")
+    # Q7 Do you play a club sport or varsity sport at home?
+    q7_plays_sport_at_home: Optional[str] = Field(description="Do you play a club sport or varsity sport at home? (Circle Yes or No)")
     
-    # Q8 What camp activities were your favorite?
-    q8_favorite_camp_activities: List[str] = Field(default_factory=list, description="List of camp activities circled/selected as favorites in Question 8.")
+    # Q8 Did you play that sport while at camp?
+    q8_played_sport_at_camp: Optional[str] = Field(description="Did you play that sport while at camp? (Circle Yes or No)")
     
-    # Q9 How many new activities did you try?
-    q9_new_activities_tried: Optional[int] = Field(description="How many new activities did you try? (Circle 0-10)")
+    # Q9 Did you go to an activity that you weren't the best at yet?
+    q9_tried_activity_not_best_at: Optional[str] = Field(description="Did you go to an activity that you weren't the best at yet? (Circle Yes or No)")
     
-    # Q10 Did you go to an activity that you weren't the best at yet?
-    q10_tried_activity_not_best_at: Optional[str] = Field(description="Did you go to an activity that you weren't the best at yet? (Yes or No)")
+    # Q10 How included did you feel in activities?
+    q10_inclusion_rating: Optional[int] = Field(description="How included did you feel in activities? (Rating 1-5)")
     
-    # Q11-Q16 Ratings (1-5, where 1 is Not at all, 5 is Very/A lot)
-    q11_inclusion_rating: Optional[int] = Field(description="How included did you feel in activities? (Rating 1-5)")
-    q12_new_friends_met: Optional[str] = Field(description="How many new friends did you meet at camp this summer? (Circle 1, 2, 3, 4, 5+)")
-    q13_campers_listening_rating: Optional[int] = Field(description="How much did other campers listen to your ideas and opinions? (Rating 1-5)")
-    q14_cabin_leader_comfort: Optional[int] = Field(description="How comfortable did you feel talking to your cabin leader? (Rating 1-5)")
-    q15_return_next_summer: Optional[int] = Field(description="How interested are you in coming back to camp next summer? (Rating 1-5)")
-    q16_recommend_camp: Optional[int] = Field(description="How likely are you to recommend Camp Belknap to someone else? (Rating 1-5)")
+    # Q11 How many new friends did you meet at camp this summer?
+    q11_new_friends_met: Optional[str] = Field(description="How many new friends did you meet at camp this summer? (Circle 1, 2, 3, 4, 5+)")
     
-    # Q17 Comments
-    q17_additional_comments: Optional[str] = Field(description="What else would like us to know about your camp experience? Transcribe the handwritten response exactly.")
+    # Q12 How comfortable did you feel talking to your cabin leader?
+    q12_cabin_leader_comfort: Optional[int] = Field(description="How comfortable did you feel talking to your cabin leader? (Rating 1-5)")
+    
+    # Q13 How interested are you in coming back to camp next summer?
+    q13_return_next_summer: Optional[int] = Field(description="How interested are you in coming back to camp next summer? (Rating 1-5)")
+    
+    # Q14 How likely are you to recommend Camp Belknap to someone else?
+    q14_recommend_camp: Optional[int] = Field(description="How likely are you to recommend Camp Belknap to someone else? (Rating 1-5)")
+    
+    # Q15 What else would you like us to know about your camp experience?
+    q15_additional_comments: Optional[str] = Field(description="What else would you like us to know about your camp experience? Transcribe the handwritten response exactly.")
+
+
+class LeaderSurvey2026(BaseModel):
+    leader_name: Optional[str] = Field(description="The leader's name handwritten at the top of the first page.")
+    division: Optional[str] = Field(description="The division name handwritten at the top of the first page. E.g. 'Juniors'")
+    cabin: Optional[str] = Field(description="The cabin letter or number handwritten at the top of the first page. E.g. 'H' or 'J-H'")
+    
+    # Q1-Q3 Experience ratings (1-5)
+    q1_cabin_rating: Optional[int] = Field(description="Cabin rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome)")
+    q2_division_rating: Optional[int] = Field(description="Division rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome)")
+    q3_camp_rating: Optional[int] = Field(description="Whole camp rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome)")
+    
+    # Q4 Rate your overall well-being during this session
+    q4_well_being_rating: Optional[int] = Field(description="Overall well-being rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome)")
+    
+    # Q5 Were you able to be present, engaged, and focused during the session?
+    q5_focus_rating: Optional[int] = Field(description="Ability to be present, engaged, and focused (circle 1-5, where 1 is Not at all, 3 is Some of the time, 5 is The whole time)")
+    
+    # Q6 Were there parts of this session that felt difficult (please explain)?
+    q6_difficult_parts: Optional[str] = Field(description="Transcribe the printed explanation of what parts of the session felt difficult.")
+    
+    # Q7 What support or experiences made your job as a Belknap leader easier this session?
+    q7_easier_support: Optional[str] = Field(description="Transcribe what support or experiences made their job as a leader easier.")
+    
+    # Q8 What was your favorite part of the day?
+    q8_favorite_part_of_day: Optional[str] = Field(description="Favorite part of the day (Circle your answer: Meals, Program Periods, General Swim, Siesta, Vespers, Free time in Divs, Evening Activities)")
+    
+    # Q9 Campers who needed the most extra support
+    q9_campers_needing_support: List[str] = Field(default_factory=list, description="List of names written under Question 9 (campers needing extra support).")
+    
+    # Q10 Campers ignored or not listened to by their peers
+    q10_campers_ignored: List[str] = Field(default_factory=list, description="List of names written under Question 10 (campers ignored or not listened to by peers).")
+    
+    # Q11 Campers suggested to reach out to in the off season
+    q11_campers_reach_out: List[str] = Field(default_factory=list, description="List of names written under Question 11 (campers to reach out to in off season).")
+    
+    # Q12 What else would you like the senior staff to know about your experience?
+    q12_additional_comments: Optional[str] = Field(description="Transcribe the comments under Question 12 exactly.")
+    
+    # Q13 What do you think Belknap should do to increase the number of leaders who return each summer?
+    q13_increase_returning_leaders: Optional[str] = Field(description="Transcribe the recommendations under Question 13 exactly.")
 
 
 def get_survey_images_base64(doc: fitz.Document, start_page: int, end_page: int) -> List[str]:
@@ -92,23 +126,35 @@ def get_survey_images_base64(doc: fitz.Document, start_page: int, end_page: int)
 
 
 def process_survey_chunk(
-    client: AzureOpenAI,
+    client: OpenAI,
     deployment_name: str,
     base64_images: List[str],
     survey_num: int,
     start_page: int,
     end_page: int,
+    schema_class: type,
     retries: int = 3
-) -> Optional[CampSurvey]:
-    """Sends 2 survey page images to Azure OpenAI GPT-4o-mini and parses the structured response."""
-    prompt = (
-        "You are an expert OCR and survey processing AI. Analyze these 2 survey page images, which are scans of a Camper Survey for Camp Belknap.\n"
-        "Carefully extract the camper's handwritten and circled answers for each question:\n"
-        "- Note that the majority of questions have the camper circle one or more answers (for ratings or multiple choice), or they are free text (for names, cabins, and comments).\n"
-        "- Extract circled numbers, circled words, and handwritten comments/numbers exactly as marked.\n"
-        "- If a question was not answered or is completely empty, leave it null.\n"
-        "- Ensure the output conforms to the requested JSON schema structure."
-    )
+) -> Optional[BaseModel]:
+    """Sends 2 survey page images to Azure OpenAI/OpenAI and parses the structured response."""
+    if schema_class.__name__ == "LeaderSurvey2026":
+        prompt = (
+            "You are an expert OCR and survey processing AI. Analyze these 2 survey page images, which are scans of a Leader Survey (Summer 2026) for Camp Belknap.\n"
+            "Carefully extract the leader's handwritten and circled answers for each question:\n"
+            "- Note that the majority of questions have the leader circle one or more answers (for ratings or multiple choice), or they are free text (for names, cabins, and comments).\n"
+            "- Extract circled numbers, circled words, and handwritten comments/names exactly as written.\n"
+            "- For questions 9, 10, and 11, extract the list of handwritten names (up to 3 names each).\n"
+            "- If a question was not answered or is completely empty, leave it null.\n"
+            "- Ensure the output conforms to the requested JSON schema structure."
+        )
+    else:
+        prompt = (
+            "You are an expert OCR and survey processing AI. Analyze these 2 survey page images, which are scans of a Camper Survey 2026 for Camp Belknap.\n"
+            "Carefully extract the camper's handwritten and circled answers for each question:\n"
+            "- Note that the majority of questions have the camper circle one or more answers (for ratings or multiple choice), or they are free text (for division, cabin, and comments).\n"
+            "- Extract circled numbers, circled words, and handwritten comments exactly as marked.\n"
+            "- If a question was not answered or is completely empty, leave it null.\n"
+            "- Ensure the output conforms to the requested JSON schema structure."
+        )
     
     # Construct the multimodal user content
     content_list = [{"type": "text", "text": prompt}]
@@ -134,7 +180,7 @@ def process_survey_chunk(
             completion = client.beta.chat.completions.parse(
                 model=deployment_name,
                 messages=messages,
-                response_format=CampSurvey,
+                response_format=schema_class,
                 temperature=0.0,  # 0.0 temperature for deterministic extraction
             )
             
@@ -172,6 +218,7 @@ def main():
     parser = argparse.ArgumentParser(description="Extract Camp Belknap Camper Surveys using Azure OpenAI.")
     parser.add_argument("pdf_path", type=str, help="Path to the scanned multi-page survey PDF file.")
     parser.add_argument("-o", "--output", type=str, default=default_output_path, help=f"Path to save the output CSV (default: {default_output_path})")
+    parser.add_argument("-t", "--type", type=str, choices=["camper", "leader"], default="camper", help="The survey type to extract (default: camper)")
     parser.add_argument("--endpoint", type=str, default=None, help="Azure OpenAI endpoint URL. If not provided, looks for AZURE_OPENAI_ENDPOINT env var.")
     parser.add_argument("--api-key", type=str, default=None, help="Azure OpenAI API Key. If not provided, looks for AZURE_OPENAI_API_KEY env var.")
     parser.add_argument("--deployment", type=str, default=None, help="Azure OpenAI model deployment name. If not provided, looks for AZURE_OPENAI_DEPLOYMENT_NAME env var.")
@@ -258,6 +305,9 @@ def main():
         client = OpenAI(api_key=api_key)
         model_name = deployment or "gpt-4o-mini"
     
+    # Resolve schema class
+    schema_class = LeaderSurvey2026 if args.type == "leader" else CamperSurvey2026
+    
     results = []
     failures = []
     chunk_size = 2
@@ -276,12 +326,13 @@ def main():
             failures.append(survey_num)
             continue
             
-        # Process using Azure OpenAI
-        survey_data = process_survey_chunk(client, model_name, base64_images, survey_num, start_page, end_page)
+        # Process using OpenAI/Azure OpenAI
+        survey_data = process_survey_chunk(client, model_name, base64_images, survey_num, start_page, end_page, schema_class)
         
         if survey_data:
             results.append(survey_data.model_dump())
-            print(f"  Successfully extracted: {survey_data.camper_name} (Cabin {survey_data.cabin})")
+            name_str = getattr(survey_data, 'camper_name', None) or getattr(survey_data, 'leader_name', 'Anonymous')
+            print(f"  Successfully extracted: {name_str} (Cabin {getattr(survey_data, 'cabin', 'N/A')})")
         else:
             failures.append(survey_num)
             
@@ -289,8 +340,13 @@ def main():
     if results:
         df = pd.DataFrame(results)
         
-        # Reorder columns slightly to keep camper info first
-        info_cols = ['camper_name', 'division', 'cabin']
+        # Reorder columns slightly to keep info first
+        if args.type == "leader":
+            info_cols = ['leader_name', 'division', 'cabin']
+        else:
+            info_cols = ['division', 'cabin']
+            
+        info_cols = [col for col in info_cols if col in df.columns]
         other_cols = [col for col in df.columns if col not in info_cols]
         df = df[info_cols + other_cols]
         

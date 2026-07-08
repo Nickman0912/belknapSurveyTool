@@ -6,7 +6,7 @@ import fitz  # PyMuPDF
 from openai import OpenAI, AzureOpenAI
 
 # Import shared extraction logic from CLI script
-from extract_surveys import CampSurvey, get_survey_images_base64, process_survey_chunk
+from extract_surveys import CamperSurvey2026, LeaderSurvey2026, get_survey_images_base64, process_survey_chunk
 
 # Set page configuration
 st.set_page_config(
@@ -398,6 +398,13 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# Survey Type Selector
+survey_type = st.radio(
+    "Select Survey Type to Process",
+    ["2026 Camper Survey", "2026 Leader Survey"],
+    horizontal=True
+)
+
 # File uploader
 uploaded_file = st.file_uploader("Upload Scanned Surveys PDF (Each survey must be exactly 2 pages)", type=["pdf"])
 
@@ -454,6 +461,9 @@ if uploaded_file is not None:
                 client = OpenAI(api_key=api_key_input.strip())
                 model_name = deployment_input.strip() or "gpt-4o-mini"
             
+            # Resolve schema class
+            schema_class = LeaderSurvey2026 if survey_type == "Leader Survey 2026" else CamperSurvey2026
+            
             results = []
             chunk_size = 2
             total_surveys = (total_pages + 1) // chunk_size
@@ -496,18 +506,22 @@ if uploaded_file is not None:
                     base64_images=base64_images,
                     survey_num=survey_num,
                     start_page=start_page,
-                    end_page=end_page
+                    end_page=end_page,
+                    schema_class=schema_class
                 )
                 
                 if survey_data:
                     results.append(survey_data.model_dump())
+                    name_str = getattr(survey_data, 'camper_name', None) or getattr(survey_data, 'leader_name', 'Anonymous')
+                    cabin_str = getattr(survey_data, 'cabin', 'N/A')
+                    div_str = getattr(survey_data, 'division', 'N/A')
                     with log_container:
                         st.markdown(f"""
                         <div class="success-log-card">
-                            <div class="log-title">🌲 Survey #{survey_num}: {survey_data.camper_name}</div>
+                            <div class="log-title">🌲 Survey #{survey_num}: {name_str}</div>
                             <div class="log-meta">
-                                <span class="log-badge">Cabin {survey_data.cabin}</span>
-                                <span class="log-badge">{survey_data.division} Division</span>
+                                <span class="log-badge">Cabin {cabin_str}</span>
+                                <span class="log-badge">{div_str} Division</span>
                                 <span>Pages {start_page}-{end_page} successfully parsed</span>
                             </div>
                         </div>
@@ -532,8 +546,13 @@ if uploaded_file is not None:
                 # Compile to DataFrame
                 df = pd.DataFrame(results)
                 
-                # Reorder columns slightly to keep camper info first
-                info_cols = ['camper_name', 'division', 'cabin']
+                # Reorder columns slightly to keep info first
+                if survey_type == "Leader Survey 2026":
+                    info_cols = ['leader_name', 'division', 'cabin']
+                else:
+                    info_cols = ['division', 'cabin']
+                
+                info_cols = [col for col in info_cols if col in df.columns]
                 other_cols = [col for col in df.columns if col not in info_cols]
                 df = df[info_cols + other_cols]
                 
