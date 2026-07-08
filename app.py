@@ -3,7 +3,7 @@ import json
 import pandas as pd
 import streamlit as st
 import fitz  # PyMuPDF
-from openai import AzureOpenAI
+from openai import OpenAI, AzureOpenAI
 
 # Import shared extraction logic from CLI script
 from extract_surveys import CampSurvey, get_survey_images_base64, process_survey_chunk
@@ -312,18 +312,19 @@ st.markdown(css_styles, unsafe_allow_html=True)
 CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "azure_config.json")
 
 def load_config():
-    """Loads Azure OpenAI config from a local JSON file if it exists."""
+    """Loads config from a local JSON file if it exists."""
     if os.path.exists(CONFIG_FILE):
         try:
             with open(CONFIG_FILE, "r") as f:
                 return json.load(f)
         except Exception:
             pass
-    return {"api_key": "", "endpoint": "", "deployment": "", "api_version": "2024-08-01-preview"}
+    return {"api_provider": "Standard OpenAI (Direct)", "api_key": "", "endpoint": "", "deployment": "gpt-4o-mini", "api_version": "2024-08-01-preview"}
 
-def save_config(api_key, endpoint, deployment, api_version):
-    """Saves Azure OpenAI credentials to a local JSON file."""
+def save_config(api_provider, api_key, endpoint, deployment, api_version):
+    """Saves credentials to a local JSON file."""
     config = {
+        "api_provider": api_provider,
         "api_key": api_key,
         "endpoint": endpoint,
         "deployment": deployment,
@@ -345,16 +346,28 @@ with st.sidebar:
             <span style="font-size: 0.75rem; letter-spacing: 2px; color: #D8F3DC; text-transform: uppercase; font-weight: 600;">Est. 1903</span>
         </div>
     """, unsafe_allow_html=True)
-    st.markdown('<p class="sidebar-title">⚙️ Azure OpenAI Settings</p>', unsafe_allow_html=True)
+    st.markdown('<p class="sidebar-title">⚙️ API Provider Settings</p>', unsafe_allow_html=True)
     st.write("Credentials are saved locally and do not need to be re-entered.")
     
-    api_key_input = st.text_input("Azure API Key", value=config.get("api_key", ""), type="password")
-    endpoint_input = st.text_input("Azure Endpoint", value=config.get("endpoint", ""), placeholder="https://your-resource.openai.azure.com/")
-    deployment_input = st.text_input("Deployment Name", value=config.get("deployment", ""), placeholder="gpt-4o-mini")
-    api_version_input = st.text_input("API Version", value=config.get("api_version", "2024-08-01-preview"))
+    api_provider = st.radio(
+        "API Provider", 
+        ["Standard OpenAI (Direct)", "Azure OpenAI"], 
+        index=0 if config.get("api_provider", "Standard OpenAI (Direct)") == "Standard OpenAI (Direct)" else 1
+    )
+    
+    if api_provider == "Standard OpenAI (Direct)":
+        api_key_input = st.text_input("OpenAI API Key", value=config.get("api_key", ""), type="password", placeholder="sk-proj-...")
+        deployment_input = st.text_input("Model Name", value=config.get("deployment", "gpt-4o-mini"), placeholder="gpt-4o-mini")
+        endpoint_input = ""
+        api_version_input = ""
+    else:
+        api_key_input = st.text_input("Azure API Key", value=config.get("api_key", ""), type="password")
+        endpoint_input = st.text_input("Azure Endpoint", value=config.get("endpoint", ""), placeholder="https://your-resource.openai.azure.com/")
+        deployment_input = st.text_input("Deployment Name", value=config.get("deployment", ""), placeholder="gpt-4o-mini")
+        api_version_input = st.text_input("API Version", value=config.get("api_version", "2024-08-01-preview"))
     
     if st.button("Save Settings"):
-        save_config(api_key_input, endpoint_input, deployment_input, api_version_input)
+        save_config(api_provider, api_key_input, endpoint_input, deployment_input, api_version_input)
         st.success("Settings saved successfully!")
         st.rerun()
 
@@ -367,10 +380,10 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Warning if settings are incomplete
-settings_incomplete = not api_key_input or not endpoint_input or not deployment_input
+settings_incomplete = not api_key_input or (api_provider == "Azure OpenAI" and (not endpoint_input or not deployment_input))
 
 if settings_incomplete:
-    st.warning("⚠️ Please fill in and save your Azure OpenAI Settings in the left sidebar to enable survey processing.")
+    st.warning("⚠️ Please fill in and save your API Provider Settings in the left sidebar to enable survey processing.")
 
 # Step-by-step instructions
 st.markdown("""
@@ -406,33 +419,40 @@ if uploaded_file is not None:
             os.makedirs(output_dir, exist_ok=True)
             output_csv_path = os.path.join(output_dir, "survey_results.csv")
             
-            from urllib.parse import urlparse, parse_qs
+            from openai import OpenAI, AzureOpenAI
             
-            # Automatically clean endpoint URL if they pasted the full endpoint path
-            cleaned_endpoint = endpoint_input.strip()
-            parsed = urlparse(cleaned_endpoint)
-            
-            # Default to the user's API version input
-            resolved_api_version = api_version_input.strip()
-            
-            # Extract api-version from query parameters if present
-            if parsed.query:
-                query_params = parse_qs(parsed.query)
-                if "api-version" in query_params:
-                    # Use the one from the URL if the user's input is empty or the default
-                    url_api_version = query_params["api-version"][0]
-                    if not resolved_api_version or resolved_api_version == "2024-08-01-preview":
-                        resolved_api_version = url_api_version
-            
-            if parsed.scheme and parsed.netloc:
-                cleaned_endpoint = f"{parsed.scheme}://{parsed.netloc}/"
+            if api_provider == "Azure OpenAI":
+                from urllib.parse import urlparse, parse_qs
+                # Automatically clean endpoint URL if they pasted the full endpoint path
+                cleaned_endpoint = endpoint_input.strip()
+                parsed = urlparse(cleaned_endpoint)
                 
-            # Initialize Azure OpenAI Client
-            client = AzureOpenAI(
-                api_key=api_key_input,
-                api_version=resolved_api_version,
-                azure_endpoint=cleaned_endpoint
-            )
+                # Default to the user's API version input
+                resolved_api_version = api_version_input.strip()
+                
+                # Extract api-version from query parameters if present
+                if parsed.query:
+                    query_params = parse_qs(parsed.query)
+                    if "api-version" in query_params:
+                        # Use the one from the URL if the user's input is empty or the default
+                        url_api_version = query_params["api-version"][0]
+                        if not resolved_api_version or resolved_api_version == "2024-08-01-preview":
+                            resolved_api_version = url_api_version
+                
+                if parsed.scheme and parsed.netloc:
+                    cleaned_endpoint = f"{parsed.scheme}://{parsed.netloc}/"
+                    
+                # Initialize Azure OpenAI Client
+                client = AzureOpenAI(
+                    api_key=api_key_input,
+                    api_version=resolved_api_version,
+                    azure_endpoint=cleaned_endpoint
+                )
+                model_name = deployment_input.strip()
+            else:
+                # Initialize standard OpenAI Client
+                client = OpenAI(api_key=api_key_input.strip())
+                model_name = deployment_input.strip() or "gpt-4o-mini"
             
             results = []
             chunk_size = 2
@@ -469,10 +489,10 @@ if uploaded_file is not None:
                         """, unsafe_allow_html=True)
                     continue
                 
-                # Call Azure OpenAI
+                # Call OpenAI/Azure OpenAI
                 survey_data = process_survey_chunk(
                     client=client,
-                    deployment_name=deployment_input,
+                    deployment_name=model_name,
                     base64_images=base64_images,
                     survey_num=survey_num,
                     start_page=start_page,

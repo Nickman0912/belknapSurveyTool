@@ -16,7 +16,7 @@ except ImportError:
     exit(1)
 
 try:
-    from openai import AzureOpenAI
+    from openai import OpenAI, AzureOpenAI
     from openai import APIError
 except ImportError:
     print("Error: The 'openai' package is not installed.")
@@ -177,46 +177,57 @@ def main():
     
     from urllib.parse import urlparse, parse_qs
 
-    # Resolve Azure OpenAI Credentials
-    api_key = args.api_key or os.environ.get("AZURE_OPENAI_API_KEY")
+    # Resolve Credentials
+    api_key = args.api_key or os.environ.get("AZURE_OPENAI_API_KEY") or os.environ.get("OPENAI_API_KEY")
     endpoint = args.endpoint or os.environ.get("AZURE_OPENAI_ENDPOINT")
     deployment = args.deployment or os.environ.get("AZURE_OPENAI_DEPLOYMENT_NAME")
 
     # Resolve API version (check if custom, fallback to query parameter, then fallback to argument)
     api_version = args.api_version
 
-    # Automatically clean endpoint URL if the user passed the full completions path
-    if endpoint:
-        endpoint = endpoint.strip()
-        parsed = urlparse(endpoint)
+    # Determine if we are using Azure or standard OpenAI
+    use_azure = endpoint is not None or os.environ.get("AZURE_OPENAI_ENDPOINT") is not None
+
+    if use_azure:
+        # Automatically clean endpoint URL if the user passed the full completions path
+        if endpoint:
+            endpoint = endpoint.strip()
+            parsed = urlparse(endpoint)
+            
+            # Extract api-version from query parameters if present and using default/none
+            if parsed.query:
+                query_params = parse_qs(parsed.query)
+                if "api-version" in query_params:
+                    url_api_version = query_params["api-version"][0]
+                    if not api_version or api_version == "2024-08-01-preview":
+                        api_version = url_api_version
+                        
+            if parsed.scheme and parsed.netloc:
+                endpoint = f"{parsed.scheme}://{parsed.netloc}/"
         
-        # Extract api-version from query parameters if present and using default/none
-        if parsed.query:
-            query_params = parse_qs(parsed.query)
-            if "api-version" in query_params:
-                url_api_version = query_params["api-version"][0]
-                if not api_version or api_version == "2024-08-01-preview":
-                    api_version = url_api_version
-                    
-        if parsed.scheme and parsed.netloc:
-            endpoint = f"{parsed.scheme}://{parsed.netloc}/"
-    
-    missing_vars = []
-    if not api_key:
-        missing_vars.append("AZURE_OPENAI_API_KEY")
-    if not endpoint:
-        missing_vars.append("AZURE_OPENAI_ENDPOINT")
-    if not deployment:
-        missing_vars.append("AZURE_OPENAI_DEPLOYMENT_NAME")
-        
-    if missing_vars:
-        print("Error: Missing Azure OpenAI credentials.")
-        print(f"Please set the following environment variables or specify them as CLI arguments: {', '.join(missing_vars)}")
-        print("\nTo set environment variables in Windows (PowerShell):")
-        print("  $env:AZURE_OPENAI_API_KEY=\"your_api_key\"")
-        print("  $env:AZURE_OPENAI_ENDPOINT=\"https://your-resource.openai.azure.com/\"")
-        print("  $env:AZURE_OPENAI_DEPLOYMENT_NAME=\"gpt-4o-mini\"")
-        exit(1)
+        missing_vars = []
+        if not api_key:
+            missing_vars.append("AZURE_OPENAI_API_KEY")
+        if not endpoint:
+            missing_vars.append("AZURE_OPENAI_ENDPOINT")
+        if not deployment:
+            missing_vars.append("AZURE_OPENAI_DEPLOYMENT_NAME")
+            
+        if missing_vars:
+            print("Error: Missing Azure OpenAI credentials.")
+            print(f"Please set the following environment variables or specify them as CLI arguments: {', '.join(missing_vars)}")
+            print("\nTo set environment variables in Windows (PowerShell) for Azure:")
+            print("  $env:AZURE_OPENAI_API_KEY=\"your_api_key\"")
+            print("  $env:AZURE_OPENAI_ENDPOINT=\"https://your-resource.openai.azure.com/\"")
+            print("  $env:AZURE_OPENAI_DEPLOYMENT_NAME=\"gpt-4o-mini\"")
+            exit(1)
+    else:
+        if not api_key:
+            print("Error: Missing OpenAI API credentials.")
+            print("Please set the OPENAI_API_KEY environment variable or specify it via --api-key.")
+            print("\nTo set standard OpenAI API Key in Windows (PowerShell):")
+            print("  $env:OPENAI_API_KEY=\"sk-proj-...\"")
+            exit(1)
         
     # Check if the PDF file exists
     if not os.path.exists(args.pdf_path):
@@ -232,12 +243,17 @@ def main():
         print(f"Error reading PDF file: {e}")
         exit(1)
         
-    # Initialize Azure OpenAI Client
-    client = AzureOpenAI(
-        api_key=api_key,
-        api_version=api_version,
-        azure_endpoint=endpoint
-    )
+    # Initialize client
+    if use_azure:
+        client = AzureOpenAI(
+            api_key=api_key,
+            api_version=api_version,
+            azure_endpoint=endpoint
+        )
+        model_name = deployment
+    else:
+        client = OpenAI(api_key=api_key)
+        model_name = deployment or "gpt-4o-mini"
     
     results = []
     failures = []
@@ -258,7 +274,7 @@ def main():
             continue
             
         # Process using Azure OpenAI
-        survey_data = process_survey_chunk(client, deployment, base64_images, survey_num, start_page, end_page)
+        survey_data = process_survey_chunk(client, model_name, base64_images, survey_num, start_page, end_page)
         
         if survey_data:
             results.append(survey_data.model_dump())
