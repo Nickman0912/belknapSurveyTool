@@ -44,7 +44,7 @@ We have built a sleek, user-friendly local web dashboard for camp staff.
 This will automatically open your web browser to `http://localhost:8501`.
 
 ### Key Features of the Web App:
-* **One-time Settings**: Enter your Azure OpenAI details once in the sidebar and click **"Save Settings"**; they will be remembered forever.
+* **One-time Settings**: Enter your API credentials (either standard OpenAI or Azure OpenAI) once in the sidebar and click **"Save Settings"**; they will be remembered forever.
 * **Drag-and-Drop Uploader**: Drag your scanned PDF directly into the browser.
 * **Progress Tracking**: See a live progress bar and extraction logs as the AI reads the surveys.
 * **Data Preview**: Inspect the extracted names, ratings, and comments in a neat spreadsheet format.
@@ -52,29 +52,39 @@ This will automatically open your web browser to `http://localhost:8501`.
 
 ---
 
-## Setup Azure OpenAI Credentials (CLI only)
+## Setup Credentials (CLI only)
 
-To run this tool, you must have an active **Azure OpenAI** resource with a **GPT-4o-mini** (or GPT-4o) model deployed.
+To run this tool, you can use either a standard **OpenAI API Key** or an active **Azure OpenAI** resource with a **gpt-4o-mini** (or gpt-4o) model.
 
-You need three credentials, which you can set as environment variables in your terminal:
+### Option A: Standard OpenAI (Direct)
+You only need to set one environment variable in your terminal:
+* **PowerShell (Windows)**:
+  ```powershell
+  $env:OPENAI_API_KEY="sk-proj-your_api_key_here"
+  ```
+* **Command Prompt (Windows)**:
+  ```cmd
+  set OPENAI_API_KEY=sk-proj-your_api_key_here
+  ```
 
+### Option B: Azure OpenAI
+You need three credentials set as environment variables:
 * **Azure Endpoint**: The URL of your Azure OpenAI resource.
 * **API Key**: The access key for your Azure OpenAI resource.
 * **Deployment Name**: The name of the deployment containing the model (e.g. `gpt-4o-mini`).
 
-### Setting Credentials in PowerShell (Windows):
-```powershell
-$env:AZURE_OPENAI_API_KEY="your_api_key_here"
-$env:AZURE_OPENAI_ENDPOINT="https://your-resource.openai.azure.com/"
-$env:AZURE_OPENAI_DEPLOYMENT_NAME="gpt-4o-mini"
-```
-
-### Setting Credentials in Command Prompt (Windows):
-```cmd
-set AZURE_OPENAI_API_KEY=your_api_key_here
-set AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
-set AZURE_OPENAI_DEPLOYMENT_NAME=gpt-4o-mini
-```
+* **PowerShell (Windows)**:
+  ```powershell
+  $env:AZURE_OPENAI_API_KEY="your_api_key_here"
+  $env:AZURE_OPENAI_ENDPOINT="https://your-resource.openai.azure.com/"
+  $env:AZURE_OPENAI_DEPLOYMENT_NAME="gpt-4o-mini"
+  ```
+* **Command Prompt (Windows)**:
+  ```cmd
+  set AZURE_OPENAI_API_KEY=your_api_key_here
+  set AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
+  set AZURE_OPENAI_DEPLOYMENT_NAME=gpt-4o-mini
+  ```
 
 ---
 
@@ -88,10 +98,10 @@ python extract_surveys.py <path_to_scanned_surveys.pdf>
 
 ### Options:
 * `-o`, `--output`: Change the output CSV filename (default is `../SurveyOutput/survey_results.csv` relative to the script's directory). The script will automatically create the `SurveyOutput` folder if it doesn't exist.
-* `--endpoint`: Pass the Azure endpoint directly (instead of using the environment variable).
-* `--api-key`: Pass the Azure API key directly (instead of using the environment variable).
-* `--deployment`: Pass the deployment name directly (instead of using the environment variable).
-* `--api-version`: Specify a different Azure API version (default is `2024-08-01-preview` which is required for structured outputs).
+* `--api-key`: Pass the API key directly (instead of using environment variables).
+* `--endpoint`: Pass the Azure endpoint directly (for Azure OpenAI).
+* `--deployment`: Pass the Azure deployment name or standard model name directly (e.g. `gpt-4o-mini`).
+* `--api-version`: Specify a different Azure API version (default is `2024-08-01-preview`).
 
 ### Example Command:
 ```bash
