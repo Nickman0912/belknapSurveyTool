@@ -153,8 +153,7 @@ css_styles = """
     
     /* Sidebar styled as deep green semi-transparent glass panel */
     [data-testid="stSidebar"] {
-        background-color: rgba(27, 67, 50, 0.96) !important;
-        backdrop-filter: blur(12px);
+        background-color: rgba(27, 67, 50, 0.98) !important;
         border-right: 2px solid #2D6A4F;
     }
     [data-testid="stSidebar"] div, [data-testid="stSidebar"] label, [data-testid="stSidebar"] p, [data-testid="stSidebar"] span, [data-testid="stSidebar"] small {
