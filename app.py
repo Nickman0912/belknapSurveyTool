@@ -474,7 +474,7 @@ if uploaded_file is not None:
                 model_name = deployment_input.strip() or "gpt-4o"
             
             # Resolve schema class
-            schema_class = LeaderSurvey2026 if survey_type == "Leader Survey 2026" else CamperSurvey2026
+            schema_class = LeaderSurvey2026 if survey_type == "2026 Leader Survey" else CamperSurvey2026
             
             results = []
             chunk_size = 2
@@ -559,7 +559,7 @@ if uploaded_file is not None:
                 df = pd.DataFrame(results)
                 
                 # Reorder columns slightly to keep info first
-                if survey_type == "Leader Survey 2026":
+                if survey_type == "2026 Leader Survey":
                     info_cols = ['leader_name', 'division', 'cabin']
                 else:
                     info_cols = ['division', 'cabin']
