@@ -73,42 +73,42 @@ class CamperSurvey2026(BaseModel):
 class LeaderSurvey2026(BaseModel):
     leader_name: Optional[str] = Field(description="The leader's name handwritten at the top of the first page. Return null if blank.")
     division: Optional[str] = Field(description="The division name handwritten at the top of the first page. E.g. 'Juniors'. Return null if blank.")
-    cabin: Optional[str] = Field(description="The cabin letter or number handwritten at the top of the first page. E.g. 'H' or 'J-H'. Return null if blank.")
+    cabin: Optional[str] = Field(description="The cabin letter or number handwritten at the top of the first page. E.g. '4' or 'H'. Return null if blank.")
     
     # Q1-Q3 Experience ratings (1-5)
-    q1_cabin_rating: Optional[int] = Field(description="Cabin rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome). Return null if not circled.")
-    q2_division_rating: Optional[int] = Field(description="Division rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome). Return null if not circled.")
-    q3_camp_rating: Optional[int] = Field(description="Whole camp rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome). Return null if not circled.")
+    q1_cabin_rating: Optional[int] = Field(description="Cabin rating on Page 1 (circle 1-5). Return null if not circled.")
+    q2_division_rating: Optional[int] = Field(description="Division rating on Page 1 (circle 1-5). Return null if not circled.")
+    q3_camp_rating: Optional[int] = Field(description="Whole camp rating on Page 1 (circle 1-5). Return null if not circled.")
     
     # Q4 Rate your overall well-being during this session
-    q4_well_being_rating: Optional[int] = Field(description="Overall well-being rating (circle 1-5, where 1 is terrible, 3 is ok, 5 is awesome). Return null if not circled.")
+    q4_well_being_rating: Optional[int] = Field(description="Overall well-being rating on Page 1 (circle 1-5). Return null if not circled.")
     
     # Q5 Were you able to be present, engaged, and focused during the session?
-    q5_focus_rating: Optional[int] = Field(description="Ability to be present, engaged, and focused (circle 1-5, where 1 is Not at all, 3 is Some of the time, 5 is The whole time). Return null if not circled.")
+    q5_focus_rating: Optional[int] = Field(description="Ability to be present, engaged, and focused on Page 1 (circle 1-5). Return null if not circled.")
     
     # Q6 Were there parts of this session that felt difficult (please explain)?
-    q6_difficult_parts: Optional[str] = Field(description="Transcribe the printed explanation of what parts of the session felt difficult. Return null if blank.")
+    q6_difficult_parts: Optional[str] = Field(description="Transcribe the handwritten explanation for Question 6 on Page 1. Return null if blank.")
     
     # Q7 What support or experiences made your job as a Belknap leader easier this session?
-    q7_easier_support: Optional[str] = Field(description="Transcribe what support or experiences made their job as a leader easier. Return null if blank.")
+    q7_easier_support: Optional[str] = Field(description="Transcribe the handwritten explanation for Question 7 on Page 1. Return null if blank.")
     
     # Q8 What was your favorite part of the day?
-    q8_favorite_part_of_day: Optional[str] = Field(description="Favorite part of the day (Circle your answer: Meals, Program Periods, General Swim, Siesta, Vespers, Free time in Divs, Evening Activities). Return null if not circled.")
+    q8_favorite_part_of_day: Optional[str] = Field(description="Favorite part of the day on Page 2 (Circle your answer: Meals, Program Periods, General Swim, Siesta, Vespers, Free time in Divs, Evening Activities). Return null if not circled.")
     
     # Q9 Campers who needed the most extra support
-    q9_campers_needing_support: List[str] = Field(default_factory=list, description="List of names written under Question 9 (campers needing extra support). Return empty list if blank.")
+    q9_campers_needing_support: List[str] = Field(default_factory=list, description="List of handwritten camper names under Question 9 on Page 2 (campers needing extra support). Return empty list if blank.")
     
     # Q10 Campers ignored or not listened to by their peers
-    q10_campers_ignored: List[str] = Field(default_factory=list, description="List of names written under Question 10 (campers ignored or not listened to by peers). Return empty list if blank.")
+    q10_campers_ignored: List[str] = Field(default_factory=list, description="List of handwritten camper names under Question 10 on Page 2 (campers ignored or not listened to by peers). Return empty list if blank.")
     
     # Q11 Campers suggested to reach out to in the off season
-    q11_campers_reach_out: List[str] = Field(default_factory=list, description="List of names written under Question 11 (campers to reach out to in off season). Return empty list if blank.")
+    q11_campers_reach_out: List[str] = Field(default_factory=list, description="List of handwritten camper names under Question 11 on Page 2 (campers to reach out to in off season). Return empty list if blank.")
     
     # Q12 What else would you like the senior staff to know about your experience?
-    q12_additional_comments: Optional[str] = Field(description="Transcribe the comments under Question 12 exactly. Return null if blank.")
+    q12_additional_comments: Optional[str] = Field(description="Transcribe the handwritten comments for Question 12 on Page 2. Return null if blank.")
     
     # Q13 What do you think Belknap should do to increase the number of leaders who return each summer?
-    q13_increase_returning_leaders: Optional[str] = Field(description="Transcribe the recommendations under Question 13 exactly. Return null if blank.")
+    q13_increase_returning_leaders: Optional[str] = Field(description="Transcribe the handwritten recommendations for Question 13 on Page 2. Return null if blank.")
 
 
 def get_survey_images_base64(doc: fitz.Document, start_page: int, end_page: int) -> List[str]:
@@ -138,20 +138,23 @@ def process_survey_chunk(
     """Sends 2 survey page images to Azure OpenAI/OpenAI and parses the structured response."""
     if schema_class.__name__ == "LeaderSurvey2026":
         prompt = (
-            "You are an expert OCR and survey processing AI. Analyze these 2 survey page images, which are scans of a Leader Survey (Summer 2026) for Camp Belknap.\n"
-            "CRITICAL DIRECTIVES:\n"
-            "1. First check if the survey is completely blank/unmarked. If there is no handwriting, drawings, circles, or marks, you MUST return a completely empty response with null for all fields (or empty lists for lists).\n"
-            "2. Only extract answers that have a clear, high-contrast, hand-drawn pen/pencil circle, checkmark, or handwritten text. Do not select or extract default printed options unless they are explicitly marked by the user.\n"
-            "3. If a specific question is blank or unmarked, you must set that field to null. Do not guess or make up answers.\n"
-            "4. For questions 9, 10, and 11, extract the list of handwritten names exactly as written (up to 3 names each)."
+            "You are an expert OCR and survey processing AI. Analyze these 2 survey page images, which are Page 1 and Page 2 of a Leader Survey (Summer 2026) for Camp Belknap.\n"
+            "Carefully examine BOTH pages and extract all handwritten and circled answers:\n"
+            "- Page 1 contains Leader Name, Division, Cabin, Q1-Q3 ratings, Q4 well-being rating, Q5 focus rating, Q6 difficult parts (handwritten paragraph), and Q7 leader support (handwritten paragraph).\n"
+            "- Page 2 contains Q8 favorite part of day (circled option), Q9 campers needing support (list of 1-3 handwritten names), Q10 campers ignored (list of 1-3 handwritten names), Q11 campers off-season (list of 1-3 handwritten names), Q12 senior staff comments (handwritten paragraph), and Q13 returning leaders recommendations (handwritten text).\n"
+            "- Transcribe all handwritten paragraphs and lists of names accurately. Do not skip handwritten text.\n"
+            "- Extract circled numbers and circled text options.\n"
+            "- If a question is unmarked or blank, set that field to null (or empty list)."
         )
     else:
         prompt = (
-            "You are an expert OCR and survey processing AI. Analyze these 2 survey page images, which are scans of a Camper Survey 2026 for Camp Belknap.\n"
-            "CRITICAL DIRECTIVES:\n"
-            "1. First check if the survey is completely blank/unmarked. If there is no handwriting, drawings, circles, or marks, you MUST return a completely empty response with null for all fields (or empty lists for lists).\n"
-            "2. Only extract answers that have a clear, high-contrast, hand-drawn pen/pencil circle, checkmark, or handwritten text. Do not select or extract default printed options unless they are explicitly marked by the user.\n"
-            "3. If a specific question is blank or unmarked, you must set that field to null. Do not guess or make up answers."
+            "You are an expert OCR and survey processing AI. Analyze these 2 survey page images, which are Page 1 and Page 2 of a Camper Survey 2026 for Camp Belknap.\n"
+            "Carefully examine BOTH pages and extract all handwritten and circled answers:\n"
+            "- Page 1 contains Division, Cabin, Q1-Q3 ratings (1-5), Q4 favorite part of day (circled option), and Q5 favorite camp activities (circled list of activities).\n"
+            "- Page 2 contains Q6 new activities tried (0-10), Q7-Q9 Yes/No questions, Q10-Q14 numerical ratings (1-5), and Q15 additional comments (handwritten paragraph).\n"
+            "- Transcribe all handwritten text and comments accurately.\n"
+            "- Extract circled numbers and circled words.\n"
+            "- If a question is unmarked or blank, set that field to null (or empty list)."
         )
     
     # Construct the multimodal user content
