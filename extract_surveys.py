@@ -193,7 +193,6 @@ def process_survey_chunk(
                 model=deployment_name,
                 messages=messages,
                 response_format=schema_class,
-                temperature=0.0,  # 0.0 temperature for deterministic extraction
             )
             
             return completion.choices[0].message.parsed
